@@ -206,6 +206,57 @@ public class BuildMapperXml {
             bw.newLine();
 
 
+            // 单条插入
+            bw.write("\t<!--插入（匹配有值的字段）-->");
+            bw.newLine();
+            bw.write("\t<insert id=\"insert\" parameterType=\"" + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + "\">");
+            bw.newLine();
+            // 返回自增长id
+            FieldInfo autoIncrementField = null;
+            for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
+                if (fieldInfo.getAutoIncrement() != null && fieldInfo.getAutoIncrement()) {
+                    autoIncrementField = fieldInfo;
+                    break;
+                }
+            }
+            if (autoIncrementField != null) {
+                bw.write("\t\t<selectKey keyProperty=\"bean." + autoIncrementField.getFieldName() + "\" resultType=\"" + autoIncrementField.getJavaType() + "\" order=\"AFTER\">");
+                bw.newLine();
+                bw.write("\t\t\tSELECT LAST_INSERT_ID()");
+                bw.newLine();
+                bw.write("\t\t</selectKey>");
+            }
+            bw.newLine();
+            bw.write("\t\tINSERT INTO " + tableInfo.getTableName());
+            bw.newLine();
+            bw.write("\t\t<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
+            bw.newLine();
+            for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
+                bw.write("\t\t\t<if test=\"bean." + fieldInfo.getPropertyName() + " != null\">");
+                bw.newLine();
+                bw.write("\t\t\t\t" + fieldInfo.getFieldName() + ",");
+                bw.newLine();
+                bw.write("\t\t\t</if>");
+                bw.newLine();
+            }
+            bw.write("\t\t</trim>");
+            bw.newLine();
+            bw.write("\t\t<trim prefix=\"values (\" suffix=\")\" suffixOverrides=\",\">");
+            bw.newLine();
+            for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
+                bw.write("\t\t\t<if test=\"bean." + fieldInfo.getPropertyName() + " != null\">");
+                bw.newLine();
+                bw.write("\t\t\t\t#{bean." + fieldInfo.getPropertyName() + "},");
+                bw.newLine();
+                bw.write("\t\t\t</if>");
+                bw.newLine();
+            }
+            bw.write("\t\t</trim>");
+            bw.newLine();
+            bw.write("\t</insert>");
+            bw.newLine();
+
+
             bw.write("</mapper>");
             bw.newLine();
             bw.newLine();
