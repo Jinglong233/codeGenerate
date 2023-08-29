@@ -36,15 +36,21 @@ public class Constants {
     public static String PACKAGE_UTILS;
     public static String PACKAGE_ENUMS;
     public static String PACKAGE_QUERY;
+    public static String PACKAGE_VO;
     public static String PACKAGE_MAPPERS;
+    public static String PACKAGE_SERVICE;
+    public static String PACKAGE_SERVICE_IMPL;
 
     public static String PATH_BASE;
     public static String PATH_PO;
     public static String PATH_UTILS;
     public static String PATH_ENUMS;
     public static String PATH_QUERY;
+    public static String PATH_VO;
     public static String PATH_MAPPERS;
     public static String PATH_MAPPERS_XMLS;
+    public static String PATH_SERVICE;
+    public static String PATH_SERVICE_IMPL;
 
 
     static {
@@ -75,8 +81,14 @@ public class Constants {
         PACKAGE_ENUMS = PACKAGE_BASE + "." + PropertiesUtils.getString("package.enums");
         // Query
         PACKAGE_QUERY = PACKAGE_BASE + "." + PropertiesUtils.getString("package.query");
+        // VO
+        PACKAGE_VO = PACKAGE_BASE + "." + PropertiesUtils.getString("package.vo");
         // MAPPER
         PACKAGE_MAPPERS = PACKAGE_BASE + "." + PropertiesUtils.getString("package.mappers");
+        // SERVICE
+        PACKAGE_SERVICE = PACKAGE_BASE + "." + PropertiesUtils.getString("package.service");
+        // SERVICE_IMPL
+        PACKAGE_SERVICE_IMPL = PACKAGE_BASE + "." + PropertiesUtils.getString("package.service.impl");
 
 
         PATH_BASE = PropertiesUtils.getString("path.base");
@@ -86,8 +98,11 @@ public class Constants {
         PATH_UTILS = PATH_BASE + "/" + PACKAGE_UTILS.replace(".", "/");
         PATH_ENUMS = PATH_BASE + "/" + PACKAGE_ENUMS.replace(".", "/");
         PATH_QUERY = PATH_BASE + "/" + PACKAGE_QUERY.replace(".", "/");
+        PATH_VO = PATH_BASE + "/" + PACKAGE_VO.replace(".", "/");
         PATH_MAPPERS = PATH_BASE + "/" + PACKAGE_MAPPERS.replace(".", "/");
         PATH_MAPPERS_XMLS = PropertiesUtils.getString("path.base") + PATH_RESOURCES + "/" + PACKAGE_MAPPERS.replace(".", "/");
+        PATH_SERVICE = PATH_BASE + "/" + PACKAGE_SERVICE.replace(".", "/");
+        PATH_SERVICE_IMPL = PATH_BASE + "/" + PACKAGE_SERVICE_IMPL.replace(".", "/");
     }
 
     public static String[] SQL_DATE_TIME_TYPES = new String[]{"datetime", "timestamp"};
