@@ -121,9 +121,9 @@ public class BuilderServiceImpl {
             bw.newLine();
             bw.write("\t\tquery.setSimplePage(page);");
             bw.newLine();
-            bw.write("\t\tList<ProductInfo> list = this.findListByParam(query);");
+            bw.write("\t\tList<" + tableInfo.getBeanName() + "> list = this.findListByParam(query);");
             bw.newLine();
-            bw.write("\t\tPaginationResultVO<ProductInfo> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);");
+            bw.write("\t\tPaginationResultVO<" + tableInfo.getBeanName() + "> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);");
             bw.newLine();
             bw.write("\t\treturn result;");
             bw.newLine();
