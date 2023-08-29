@@ -49,6 +49,37 @@ public class BuildBase {
         headerInfoList.add("package " + Constants.PACKAGE_VO + ";");
         build(headerInfoList, "PaginationResultVO", Constants.PATH_VO);
 
+        // 生成BusinessException
+        headerInfoList.clear();
+        headerInfoList.add("package " + Constants.PACKAGE_EXCEPTION + ";");
+        headerInfoList.add("import " + Constants.PACKAGE_ENUMS + ".ResponseCodeEnum;");
+        build(headerInfoList, "BusinessException", Constants.PATH_EXCEPTION);
+
+        // 生成ResponseCodeEnum枚举
+        headerInfoList.clear();
+        headerInfoList.add("package " + Constants.PACKAGE_ENUMS + ";");
+        build(headerInfoList, "ResponseCodeEnum", Constants.PATH_ENUMS);
+
+        // 生成ResponseVO
+        headerInfoList.clear();
+        headerInfoList.add("package " + Constants.PACKAGE_VO + ";");
+        build(headerInfoList, "ResponseVO", Constants.PATH_VO);
+
+        // 生成ABaseController枚举
+        headerInfoList.clear();
+        headerInfoList.add("package " + Constants.PACKAGE_CONTROLLER + ";");
+        headerInfoList.add("import " + Constants.PACKAGE_VO + ".ResponseVO;");
+        headerInfoList.add("import " + Constants.PACKAGE_ENUMS + ".ResponseCodeEnum;");
+        build(headerInfoList, "ABaseController", Constants.PATH_CONTROLLER);
+
+        // 生成AGlobalExceptionHandlerController
+        headerInfoList.clear();
+        headerInfoList.add("package " + Constants.PACKAGE_CONTROLLER + ";");
+        headerInfoList.add("import " + Constants.PACKAGE_VO + ".ResponseVO;");
+        headerInfoList.add("import " + Constants.PACKAGE_ENUMS + ".ResponseCodeEnum;");
+        headerInfoList.add("import " + Constants.PACKAGE_EXCEPTION + ".BusinessException;");
+        build(headerInfoList, "AGlobalExceptionHandlerController", Constants.PATH_CONTROLLER);
+
     }
 
     public static void build(List<String> headerInfoList, String fileName, String outPutPath) {

@@ -196,7 +196,7 @@ public class BuildMapperXml {
             // 查询数量
             bw.write("\t<!--查询数量-->");
             bw.newLine();
-            bw.write("\t<select id=\"selectCount\" resultType=\"java.lang.Long\">");
+            bw.write("\t<select id=\"selectCount\" resultType=\"java.lang.Integer\">");
             bw.newLine();
             bw.write("\t\tSELECT COUNT(1)");
             bw.newLine();
@@ -231,7 +231,7 @@ public class BuildMapperXml {
             bw.newLine();
             bw.write("\t\tINSERT INTO " + tableInfo.getTableName());
             bw.newLine();
-            bw.write("\t\t<trim prefix=\"(\"suffix=\")\" suffixOverrides=\",\">");
+            bw.write("\t\t<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
             bw.newLine();
             for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
                 bw.write("\t\t\t<if test=\"bean." + fieldInfo.getPropertyName() + " != null\">");
