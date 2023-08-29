@@ -3,6 +3,7 @@ package com.generate.project.builder;
 import com.generate.project.bean.Constants;
 import com.generate.project.bean.FieldInfo;
 import com.generate.project.bean.TableInfo;
+import com.generate.project.utils.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -210,7 +211,7 @@ public class BuildMapperXml {
             // 单条插入
             bw.write("\t<!--插入（匹配有值的字段）-->");
             bw.newLine();
-            bw.write("\t<insert id=\"insert\" parameterType=\"" + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + "\">");
+            bw.write("\t<insert id=\"insert\" parameterType=\"" + poClass + "\">");
             bw.newLine();
             // 返回自增长id
             FieldInfo autoIncrementField = null;
@@ -230,7 +231,7 @@ public class BuildMapperXml {
             bw.newLine();
             bw.write("\t\tINSERT INTO " + tableInfo.getTableName());
             bw.newLine();
-            bw.write("\t\t<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
+            bw.write("\t\t<trim prefix=\"(\"suffix=\")\" suffixOverrides=\",\">");
             bw.newLine();
             for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
                 bw.write("\t\t\t<if test=\"bean." + fieldInfo.getPropertyName() + " != null\">");
@@ -262,7 +263,7 @@ public class BuildMapperXml {
             // 插入或者更新
             bw.write("\t<!--插入（匹配有值的字段）-->");
             bw.newLine();
-            bw.write("\t<insert id=\"insertOrUpdate\" parameterType=\"" + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + "\">");
+            bw.write("\t<insert id=\"insertOrUpdate\" parameterType=\"" + poClass + "\">");
             bw.newLine();
             bw.write("\t\tINSERT INTO " + tableInfo.getTableName());
             bw.newLine();
@@ -317,12 +318,134 @@ public class BuildMapperXml {
             bw.newLine();
             bw.write("\t</insert>");
             bw.newLine();
+            bw.newLine();
 
+
+            // 批量插入
+            bw.write("\t<!--添加（批量插入）-->");
+            bw.newLine();
+            bw.write("\t<insert id=\"insertBatch\" parameterType=\"" + poClass + "\">");
+            bw.newLine();
+            StringBuffer insertFieldBuffer = new StringBuffer();
+            StringBuffer insertPropertyBuffer = new StringBuffer();
+            for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
+                // 去除自增长
+                if (fieldInfo.getAutoIncrement()) {
+                    continue;
+                }
+                insertFieldBuffer.append(fieldInfo.getFieldName()).append(",");
+                insertPropertyBuffer.append("#{item." + fieldInfo.getPropertyName() + "}").append(",");
+            }
+            String insertFieldStr = insertFieldBuffer.substring(0, insertFieldBuffer.lastIndexOf(","));
+            bw.write("\t\tINSERT INTO " + tableInfo.getTableName() + "(" + insertFieldStr + ")values");
+            bw.newLine();
+            bw.write("\t\t<foreach collection=\"list\" item=\"item\" separator=\",\">");
+            bw.newLine();
+            String insertPropertyBufferStr = insertPropertyBuffer.substring(0, insertPropertyBuffer.lastIndexOf(","));
+            bw.write("\t\t\t(" + insertPropertyBufferStr + ")");
+            bw.newLine();
+            bw.write("\t\t</foreach>");
+            bw.newLine();
+            bw.write("\t</insert>");
+            bw.newLine();
+            bw.newLine();
+
+
+            // 批量插入或更新
+            bw.write("\t<!--批量插入或更新-->");
+            bw.newLine();
+            bw.write("\t<insert id=\"insertOrUpdateBatch\" parameterType=\"" + poClass + "\">");
+            bw.newLine();
+            insertFieldStr = insertFieldBuffer.substring(0, insertFieldBuffer.lastIndexOf(","));
+            bw.write("\t\tINSERT INTO \n\t\t" + tableInfo.getTableName() + "(" + insertFieldStr + ")values");
+            bw.newLine();
+            bw.write("\t\t<foreach collection=\"list\" item=\"item\" separator=\",\">");
+            bw.newLine();
+            insertPropertyBufferStr = insertPropertyBuffer.substring(0, insertPropertyBuffer.lastIndexOf(","));
+            bw.write("\t\t\t(" + insertPropertyBufferStr + ")");
+            bw.newLine();
+            bw.write("\t\t</foreach>");
+            bw.newLine();
+            bw.write("\t\t\ton DUPLICATE key update");
+            StringBuffer insertBatchUpdateBuffer = new StringBuffer();
+            for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
+                insertBatchUpdateBuffer.append(fieldInfo.getFieldName() + "= VALUES(" + fieldInfo.getFieldName() + "),");
+            }
+            String insertBatchUpdateBufferStr = insertBatchUpdateBuffer.substring(0, insertBatchUpdateBuffer.lastIndexOf(","));
+            bw.write(" " + insertBatchUpdateBufferStr);
+            bw.newLine();
+            bw.write("\t</insert>");
+            bw.newLine();
+            bw.newLine();
+
+            // 根据主键更新
+            for (Map.Entry<String, List<FieldInfo>> entry : keyIndexMap.entrySet()) {
+                List<FieldInfo> keyFieldInfoList = entry.getValue();
+                Integer index = 0;
+                StringBuilder methodName = new StringBuilder();
+                StringBuffer paramsNames = new StringBuffer();
+                for (FieldInfo fieldInfo : keyFieldInfoList) {
+                    index++;
+                    methodName.append(StringUtils.upperCaseFirstLetter(fieldInfo.getPropertyName()));
+                    paramsNames.append(fieldInfo.getFieldName() + "=#{" + fieldInfo.getPropertyName() + "}");
+                    if (index < keyFieldInfoList.size()) {
+                        methodName.append("And");
+                        paramsNames.append(" and ");
+                    }
+                }
+                bw.newLine();
+                // 生成查询相关
+                bw.write("\t<!--根据" + methodName + "查询-->");
+                bw.newLine();
+                bw.write("\t<select id=\"selectBy" + methodName + "\" resultMap=\"base_result_map\">");
+                bw.newLine();
+                bw.write("\t\tselect \n\t\t<include refid=\"" + BASE_COLUMN_LIST + "\"/>");
+                bw.newLine();
+                bw.write("\t\tfrom " + tableInfo.getTableName() + " where " + paramsNames);
+                bw.newLine();
+                bw.write("\t</select>");
+                bw.newLine();
+                bw.newLine();
+
+                // 生成更新相关
+                bw.write("\t<!--根据" + methodName + "更新-->");
+                bw.newLine();
+                bw.write("\t<update id=\"updateBy" + methodName + "\" parameterType=\"" + poClass + "\">");
+                bw.newLine();
+                bw.write("\t\tupdate " + tableInfo.getTableName());
+                bw.newLine();
+                bw.write("\t\t<set>");
+                bw.newLine();
+                for (FieldInfo fieldInfo : tableInfo.getFieldList()) {
+                    bw.write("\t\t\t<if test=\"bean." + fieldInfo.getPropertyName() + " != null\">");
+                    bw.newLine();
+                    bw.write("\t\t\t\t" + fieldInfo.getFieldName() + " = #{bean." + fieldInfo.getPropertyName() + "},");
+                    bw.newLine();
+                    bw.write("\t\t\t</if>");
+                    bw.newLine();
+                }
+                bw.write("\t\t</set>");
+                bw.newLine();
+                bw.write("\t\twhere " + paramsNames);
+                bw.newLine();
+                bw.write("\t</update>");
+                bw.newLine();
+                bw.newLine();
+
+                // 生成删除相关
+                bw.write("\t<!--根据" + methodName + "删除-->");
+                bw.newLine();
+                bw.write("\t<delete id=\"deleteBy" + methodName + "\">");
+                bw.newLine();
+                bw.write("\t\tdelete from " + tableInfo.getTableName() + " where " + paramsNames);
+                bw.newLine();
+                bw.write("\t</delete>");
+                bw.newLine();
+            }
 
             bw.write("</mapper>");
             bw.newLine();
             bw.newLine();
-
             bw.flush();
         } catch (Exception e) {
             logger.info("创建Mappers XML失败");
