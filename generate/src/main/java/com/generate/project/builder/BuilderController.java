@@ -57,7 +57,7 @@ public class BuilderController {
             bw.newLine();
 
 
-            BuildComment.createClassComment(bw, tableInfo.getComment() + "Service");
+            BuildComment.createClassComment(bw, tableInfo.getComment() + "Controller");
             bw.write("@RestController");
             bw.newLine();
             bw.write("@RequestMapping(\"/" + StringUtils.lowerCaseFirstLetter(tableInfo.getBeanName()) + "\")");
