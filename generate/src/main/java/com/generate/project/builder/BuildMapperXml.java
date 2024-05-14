@@ -109,7 +109,7 @@ public class BuildMapperXml {
                 }
                 bw.write("\t\t<if test=\"query." + fieldInfo.getPropertyName() + " != null" + stringQuery + "\">");
                 bw.newLine();
-                bw.write("\t\t\tand id = #{query." + fieldInfo.getPropertyName() + "}");
+                bw.write("\t\t\tand " + fieldInfo.getFieldName() + " = #{query." + fieldInfo.getPropertyName() + "}");
                 bw.newLine();
                 bw.write("\t\t</if>");
                 bw.newLine();
@@ -133,7 +133,7 @@ public class BuildMapperXml {
                     if (fieldInfo.getPropertyName().endsWith(Constants.SUFFIX_BEAN_QUERY_TIME_START)) {
                         andWhere = "<![CDATA[ and " + fieldInfo.getFieldName() + " >= str_to_date(#{query." + fieldInfo.getPropertyName() + "}, '%Y-%m-%d') ]]>";
                     } else if (fieldInfo.getPropertyName().endsWith(Constants.SUFFIX_BEAN_QUERY_TIME_END)) {
-                        andWhere = "<![CDATA[ and " + fieldInfo.getFieldName() + " < data_sub(str_to_date(#{query." + fieldInfo.getPropertyName() + "}, '%Y-%m-%d'), interval -1 day) ]]>";
+                        andWhere = "<![CDATA[ and " + fieldInfo.getFieldName() + " < date_sub(str_to_date(#{query." + fieldInfo.getPropertyName() + "}, '%Y-%m-%d'), interval -1 day) ]]>";
 
                     }
                 }
