@@ -3,6 +3,13 @@ public class BaseQuery{
     private Integer pageNo;
     private Integer pageSize;
     private String orderBy;
+    private String sort;
+
+
+     public BaseQuery() {
+        //  默认倒叙
+        sort = QuerySort.DESC.getValue();
+    }
 
     public SimplePage getSimplePage() {
         return simplePage;

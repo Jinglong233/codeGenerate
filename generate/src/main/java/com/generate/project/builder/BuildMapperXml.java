@@ -179,7 +179,7 @@ public class BuildMapperXml {
             bw.newLine();
             bw.write("\t\t<if test=\"query.orderBy!=null\">");
             bw.newLine();
-            bw.write("\t\t\torder by ${query.OrderBy}");
+            bw.write("\t\t\torder by ${query.orderBy} ${query.sort}");
             bw.newLine();
             bw.write("\t\t</if>");
             bw.newLine();
